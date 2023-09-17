@@ -1,65 +1,101 @@
-class atm:
-    def __init__(self, pin = 4356 ,balance = 3000):
-        print("-----welcome-----")
-        self.pin = pin 
-        self.balance = balance
-    
-    def deposit(self , amount):
-        self.amount = amount 
-        self.balance = amount + self.balance
-        print(f"Your bank balance : {self.balance}")
-    
-    def withdraw(self , amount):
-        self.amount = amount
-        if (self.amount < self.balance):
-           self.balance = self.balance - self.amount 
-           print(f"Your bank balance : {self.balance}")
+import tkinter as tk
+
+class BankAccount:
+    def __init__(self, account_number, account_holder, initial_balance=0):
+        self.account_number = account_number
+        self.account_holder = account_holder
+        self.balance = initial_balance
+
+    def deposit(self, amount):
+        if amount > 0:
+            self.balance += amount
+            l4.config(text=f"Deposited ${amount}. New balance: ${self.balance}")
         else:
-            print("--------INSUFFICIENT BALANCE----------")
+            l4.config(text="Invalid deposit amount. Please enter a positive number.")
 
-    def check_balance(self , balance):
-        print(f"Your bank balance : {self.balance}")
-
-    def exit(self):
-        print("----- THANK YOU ------")
-
-    def transaction(self):
-        print(""" 
-             ---------- TRANSACTION SITE -----------
-              1. WITHDRAW 
-              2. DEPOSIT
-              3. CHECK BALANCE
-              4. EXIT
-               """)
-         
-        
-        option = int(input("ENTER WHAT YOU WNAT DO 1 , 2 , 3 , 4 ")) 
-        
-        if (option == 1): 
-            amount = int(input("ENTER AMOUNT YOU WANT TO WITHDRAW : "))        
-            self.withdraw(amount)         
-        elif (option == 2):        
-            amount = int(input("ENTER AMOUNT YOU WANT TO DEPOSIT : "))     
-            self.deposit(amount)         
-        elif (option == 3):         
-            self.check_balance()         
-        elif (option == 4):         
-            self.exit()
+    def withdraw(self, amount):
+        if amount > 0 and amount <= self.balance:
+            self.balance -= amount
+            l5.config(text=f"Withdrew ${amount}. New balance: ${self.balance}")
+        elif amount <= 0:
+            l5.config(text="Invalid withdrawal amount. Please enter a positive number.")
         else:
-            print("__________ WRONG COMMAND _________")
+            l5.config(text="Insufficient funds.")
 
+    def check_balance(self):
+        l5.config(text=f"Account balance for {self.account_holder}: ${self.balance}")
 
-print("------WELCOME TO SiB------ ")
-atm_pin = int(input("ENTER YOUR ATM PIN : "))
-if (atm_pin == 4356):
-     atm1 = atm()
-     atm1.transaction()
-else:
-    print("----INVALID PiN-----")
+def register_account():
+    account_number = t1.get()
+    username = t2.get()
+    initial_balance = float(t3.get())
+    # Create a new bank account for the user and store it in a dictionary with the account number as the key.
+    accounts[account_number] = BankAccount(account_number, username, initial_balance)
+    l4.config(text=f"Account for {username} registered with an initial balance of ${initial_balance}.")
 
+def view_balance():
+    # Retrieve the account for the current account number and display their balance.
+    account_number = t1.get()
+    account = accounts.get(account_number)
+    if account:
+        account.check_balance()
+    else:
+        l5.config(text="Account not found.")
 
+def deposit_money():
+    account_number = t1.get()
+    account = accounts.get(account_number)
+    if account:
+        amount = float(t3.get())  # Use t3 for the deposit amount
+        account.deposit(amount)
+    else:
+        l4.config(text="Account not found.")
 
+def withdraw_money():
+    account_number = t1.get()
+    account = accounts.get(account_number)
+    if account:
+        amount = float(t3.get())  # Use t3 for the withdrawal amount
+        account.withdraw(amount)
+    else:
+        l4.config(text="Account not found.")
 
+root = tk.Tk()
+root.title("Simple Bank System")
+root.geometry('350x200')
 
+accounts = {}  # Dictionary to store user accounts
 
-        
+l1 = tk.Label(root, text="Account Number")
+l2 = tk.Label(root, text="User Name")
+l3 = tk.Label(root, text="Amount")
+
+t1 = tk.Entry(root)
+t2 = tk.Entry(root)
+t3 = tk.Entry(root)
+
+b1 = tk.Button(root, text="Registration", command=register_account)
+b2 = tk.Button(root, text="View Balance", command=view_balance)
+b3 = tk.Button(root, text="Deposit", command=deposit_money)
+b4 = tk.Button(root, text="Withdraw", command=withdraw_money)
+
+l1.grid(row=0, column=0)
+l2.grid(row=1, column=0)
+l3.grid(row=2, column=0)
+
+t1.grid(row=0, column=1)
+t2.grid(row=1, column=1)
+t3.grid(row=2, column=1)
+
+b1.grid(row=3, column=1)
+b2.grid(row=4, column=1)
+b3.grid(row=5, column=1)
+b4.grid(row=6, column=1)
+
+l4 = tk.Label(root, text="", fg="green")
+l4.grid(row=7, column=1)
+
+l5 = tk.Label(root, text="", fg="blue")
+l5.grid(row=8, column=1)
+
+tk.mainloop()
